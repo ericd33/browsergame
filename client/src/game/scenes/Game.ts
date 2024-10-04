@@ -14,8 +14,8 @@ export class Game extends Scene {
         super("Game");
     }
     player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-    floor: any;
-    //floor: Phaser.Types.Physics.Arcade.StaticGroup;
+    // floor: any;
+    floor: ReturnType<typeof this.physics.add.staticGroup>;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     lp: Phaser.Input.Keyboard.Key;
     jump: Phaser.Input.Keyboard.Key;
@@ -34,23 +34,23 @@ export class Game extends Scene {
         });
 
         this.load.spritesheet("ryu-idle", "ryu-idle.png", {
-            frameWidth: 78,
-            frameHeight: 110,
+            frameWidth: 57,
+            frameHeight: 108,
         });
     }
 
     create() {
         this.floor = this.physics.add.staticGroup();
-        this.player = this.physics.add.sprite(500, 600, "star");
+        this.player = this.physics.add.sprite(500, 600, "ryu-idle");
         this.physics.add.collider(this.player, this.floor);
         if (this.input.keyboard) {
             this.cursors = this.input.keyboard.createCursorKeys();
             this.lp = this.input.keyboard.addKey(
-                Phaser.Input.Keyboard.KeyCodes.A
+                Phaser.Input.Keyboard.KeyCodes.A,
             );
 
             this.jump = this.input.keyboard.addKey(
-                Phaser.Input.Keyboard.KeyCodes.SPACE
+                Phaser.Input.Keyboard.KeyCodes.SPACE,
             );
         }
 
@@ -58,20 +58,10 @@ export class Game extends Scene {
             key: "idleman",
             frames: this.anims.generateFrameNumbers("ryu-idle", {
                 start: 0,
-                end: 3,
+                end: 6,
             }),
             frameRate: 10,
-            repeat: 1,
-        });
-
-        this.anims.create({
-            key: "walk-left",
-            frames: this.anims.generateFrameNumbers("ryu-walk", {
-                start: 0,
-                end: 7,
-            }),
-            frameRate: 10,
-            repeat: 1,
+            repeat: -1,
         });
 
         this.anims.create({
@@ -87,6 +77,8 @@ export class Game extends Scene {
         this.player.setBounce(0.2);
         this.player.setScale(1);
         this.player.setCollideWorldBounds(true);
+
+        this.player.anims.play("idleman", true);
 
         this.floor.create(500, 750, "ground").setScale(10, 2).refreshBody();
 
@@ -114,7 +106,6 @@ export class Game extends Scene {
             }
 
             if (Phaser.Input.Keyboard.JustDown(this.jump)) {
-                this.player.anims.play("idleman", true);
             }
 
             if (Phaser.Input.Keyboard.JustDown(this.lp)) {
